@@ -1,0 +1,22 @@
+﻿using ChessLogic.Enum;
+
+namespace ChessLogic.ChessPiece
+{
+    public class Queen : Piece
+    {
+        public override PieceType Type => PieceType.Queen;
+        public override Player Color { get; }
+
+        public Queen(Player color)
+        {
+            Color = color;
+        }
+
+        public override Piece Copy()
+        {
+            Queen copy = new Queen(Color);
+            copy.HasMoved = HasMoved;
+            return copy;
+        }
+    }
+}
