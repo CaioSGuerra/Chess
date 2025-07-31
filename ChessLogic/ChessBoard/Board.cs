@@ -1,26 +1,21 @@
 ﻿using ChessLogic.ChessPiece;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChessLogic
 {
     public class Board
     {
-        private readonly Piece[,] pieces = new Piece[8,8];
+        private readonly Piece[,] pieces = new Piece[8, 8];
 
-        public Piece this[int row, int col]
+        public Piece this[int row, int column]
         {
-            get { return pieces[row, col]; }
-            set { pieces[row, col] = value; }
+            get { return pieces[row, column]; }
+            set { pieces[row, column] = value; }
         }
 
-        public Piece this[Position pos]
+        public Piece this[Position position]
         {
-            get { return this[pos.Row, pos.Column]; }
-            set { this[pos.Row, pos.Column] = value; }
+            get { return this[position.Row, position.Column]; }
+            set { this[position.Row, position.Column] = value; }
         }
 
         public static Board Initial()
@@ -58,15 +53,15 @@ namespace ChessLogic
         }
 
         //return true is the new position is inside the board
-        public static bool IsInside(Position pos)
+        public static bool IsInside(Position postion)
         {
-            return pos.Row >= 0 && pos.Row < 8 && pos.Column >= 0 && pos.Column < 8;
+            return postion.Row >= 0 && postion.Row < 8 && postion.Column >= 0 && postion.Column < 8;
         }
 
         //check if there's a piece on the new position
-        public bool IsEmpty(Position pos)
+        public bool IsEmpty(Position position)
         {
-            return this[pos] == null;
+            return this[position] == null;
         }
     }
 }

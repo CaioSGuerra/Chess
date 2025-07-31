@@ -45,9 +45,9 @@ namespace ChessLogic
             return !(left == right);
         }
 
-        public static Position operator +(Position pos, Direction dir)
+        public static Position operator +(Position position, Direction direction)
         {
-            return new Position(pos.Row + dir.RowDelta, pos.Column + dir.ColumnDelta);
+            return new Position(position.Row + direction.RowDelta, position.Column + direction.ColumnDelta);
         }
     }
 }
