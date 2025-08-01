@@ -1,4 +1,5 @@
 ﻿using ChessLogic.Enum;
+using ChessLogic.Moves;
 
 namespace ChessLogic.ChessPiece
 {
@@ -7,7 +8,16 @@ namespace ChessLogic.ChessPiece
         public override PieceType Type => PieceType.Bishop;
         public override Player Color { get; }
 
-        public Bishop (Player color)
+        // A direction array that contains all diagonal directions
+        private static readonly Direction[] directionVector = new Direction[]
+        {
+            Direction.NorthWest,
+            Direction.NorthEast,
+            Direction.SouthWest,
+            Direction.SouthEast
+        };
+
+        public Bishop(Player color)
         {
             Color = color;
         }
@@ -17,6 +27,12 @@ namespace ChessLogic.ChessPiece
             Bishop copy = new Bishop(Color);
             copy.HasMoved = HasMoved;
             return copy;
+        }
+
+        // A method to implement 'GetMoves' por super class
+        public override IEnumerable<Move> GetMoves(Position fromPosition, Board board)
+        {
+            return MovePositionsInDirection(fromPosition, board, directionVector).Select(toPosition => new NormalMove(fromPosition, toPosition));
         }
     }
 }

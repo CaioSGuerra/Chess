@@ -39,10 +39,10 @@ namespace ChessLogic.ChessPiece
         }
 
         // A Method which takes an array of directions
-        protected IEnumerable<Position> MovePositionsInDirection(Position fromPosition, Board board, Direction[] directions)
+        protected IEnumerable<Position> MovePositionsInDirection(Position fromPosition, Board board, Direction[] directionVector)
         {
             // Collect all reachable positions for all ggiven directions
-            return directions.SelectMany(direction => MovePositionsInDirection(fromPosition, board, direction));
+            return directionVector.SelectMany(direction => MovePositionsInDirection(fromPosition, board, direction));
         }
     }
 }
