@@ -1,4 +1,5 @@
 ﻿using ChessLogic.Enum;
+using ChessLogic.Moves;
 
 namespace ChessLogic.ChessPiece
 {
@@ -6,6 +7,21 @@ namespace ChessLogic.ChessPiece
     {
         public override PieceType Type => PieceType.King;
         public override Player Color { get; }
+
+        // All directions the piece can move
+        private static readonly Direction[] directionVector = new Direction[]
+        {
+
+            Direction.North,
+            Direction.East,
+            Direction.West,
+            Direction.South,
+            Direction.NorthWest,
+            Direction.NorthEast,
+            Direction.SouthWest,
+            Direction.SouthEast
+
+        };
 
         public King(Player color)
         {
@@ -17,6 +33,41 @@ namespace ChessLogic.ChessPiece
             King copy = new King(Color);
             copy.HasMoved = HasMoved;
             return copy;
+        }
+
+        // A method to loop through word directions and for each of them take a single position
+        private IEnumerable<Position> MovePositions(Position fromPosition, Board board)
+        {
+            foreach (Direction direction in directionVector)
+            {
+                // for each of them it take a single step from king's current position 
+                Position toPosition = fromPosition + direction;
+
+                // Check if the position is outside the board
+                if (!Board.IsInside(toPosition))
+                {
+                    // Skip to next foreach
+                    continue;
+                }
+
+                // Check if the position is a empty space or opponent piece
+                if (board.IsEmpty(toPosition) || board[toPosition].Color != Color)
+                {
+                    yield return toPosition;
+                }
+            }
+        }
+
+
+        public override IEnumerable<Move> GetMoves(Position fromPosition, Board board)
+        {
+            // Loops through the allowed positions
+            foreach (Position toPosition in MovePositions(fromPosition, board))
+            {
+                // Return a normal move from each of them
+                yield return new NormalMove(fromPosition, toPosition);
+            }
+
         }
     }
 }
