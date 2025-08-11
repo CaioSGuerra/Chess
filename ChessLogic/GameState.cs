@@ -1,5 +1,7 @@
 ﻿
+using ChessLogic.ChessPiece;
 using ChessLogic.Enum;
+using ChessLogic.Moves;
 
 namespace ChessLogic
 {
@@ -13,5 +15,29 @@ namespace ChessLogic
             CurrentPLayer = player;
             Board = board;
         }
+
+        // Take a position as a parameter and take all moves that piece can make
+        public IEnumerable<Move> LegalMovesForPiece(Position position)
+        {
+            // Check if you choose an legal position 
+            if (Board.IsEmpty(position) || Board[position].Color != CurrentPLayer)
+            {
+                // Return an empty sequence of Move to indicate no possible moves from this position
+                return Enumerable.Empty<Move>();
+            }
+
+            // Get the piece from chosen position
+            Piece piece = Board[position];
+            // return all moves it can make
+            return piece.GetMoves(position, Board);
+        }
+
+        // Create a method to make the piece move
+        public void MakeMove(Move move)
+        {
+            move.Execute(Board);
+            CurrentPLayer = CurrentPLayer.Opponent();
+        }
+
     }
 }

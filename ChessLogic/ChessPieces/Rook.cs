@@ -8,7 +8,7 @@ namespace ChessLogic.ChessPiece
         public override PieceType Type => PieceType.Rook;
         public override Player Color { get; }
 
-        // A direction array that contains all vertical directions
+        // A direction array that contains all vertical and horizontal directions
         private static readonly Direction[] directionVector = new Direction[]
         {
             Direction.North,
