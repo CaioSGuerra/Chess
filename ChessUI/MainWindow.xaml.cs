@@ -1,5 +1,6 @@
 ﻿using ChessLogic;
 using ChessLogic.ChessPiece;
+using ChessLogic.Enum;
 using ChessLogic.Moves;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,6 +31,8 @@ namespace ChessUI
 
             gameState = new GameState(ChessLogic.Enum.Player.White, Board.Initial());
             DrawBoard(gameState.Board);
+            // Update the cursor to match the current player, changing after each move
+            SetCursor(gameState.CurrentPLayer);
         }
 
         private void InitializeBoard()
@@ -128,6 +131,7 @@ namespace ChessUI
         {
             gameState.MakeMove(move);
             DrawBoard(gameState.Board);
+            SetCursor(gameState.CurrentPLayer);
         }
         private void OnToPositionSelected(Position position)
         {
@@ -176,6 +180,19 @@ namespace ChessUI
             {
                 // Hide all highlighted positions
                 multipleHighlight[toPosition.Row, toPosition.Column].Fill = Brushes.Transparent;
+            }
+        }
+
+        // This method sends a reference to the ChessCursors class, indicating which file image the Stream will use
+        private void SetCursor(Player player)
+        {
+            if (player == Player.White)
+            {
+                Cursor = ChessCursors.WhiteCursor;
+            }
+            else
+            {
+                Cursor = ChessCursors.BlackCursor;
             }
         }
     }
