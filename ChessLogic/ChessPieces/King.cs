@@ -9,7 +9,7 @@ namespace ChessLogic.ChessPiece
         public override Player Color { get; }
 
         // All directions the piece can move
-        private static readonly Direction[] directionVector = new Direction[]
+        private static readonly Direction[] _directionVector = new Direction[]
         {
 
             Direction.North,
@@ -38,7 +38,7 @@ namespace ChessLogic.ChessPiece
         // A method to loop through word directions and for each of them take a single position
         private IEnumerable<Position> MovePositions(Position fromPosition, Board board)
         {
-            foreach (Direction direction in directionVector)
+            foreach (Direction direction in _directionVector)
             {
                 // for each of them it take a single step from king's current position 
                 Position toPosition = fromPosition + direction;
@@ -67,7 +67,16 @@ namespace ChessLogic.ChessPiece
                 // Return a normal move from each of them
                 yield return new NormalMove(fromPosition, toPosition);
             }
+        }
 
+        public override bool CanCaptureTheKing(Position fromPosition, Board board)
+        {
+            return MovePositions(fromPosition, board) // Generate the move positions
+                .Any(toPosition => // Check if the opponent king is in any of these positions
+                {
+                    Piece piece = board[toPosition];
+                    return piece != null && piece.Type == PieceType.King;
+                });
         }
     }
 }

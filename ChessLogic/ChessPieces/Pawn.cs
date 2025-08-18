@@ -8,7 +8,7 @@ namespace ChessLogic.ChessPiece
         public override PieceType Type => PieceType.Pawn;
         public override Player Color { get; }
 
-        private readonly Direction forward;
+        private readonly Direction _forward;
 
         public Pawn(Player color)
         {
@@ -16,11 +16,11 @@ namespace ChessLogic.ChessPiece
             // The chess logic to make both pawn to move only in one direction
             if (color == Player.White)
             {
-                forward = Direction.North;
+                _forward = Direction.North;
             }
             else if (color == Player.Black)
             {
-                forward = Direction.South;
+                _forward = Direction.South;
             }
         }
 
@@ -50,15 +50,15 @@ namespace ChessLogic.ChessPiece
         // Method of all forward and non-capture moves
         private IEnumerable<Move> ForwardMoves(Position fromPosition, Board board)
         {
-            // Create a position imediatly in front of pawn
-            Position oneMovePosition = fromPosition + forward;
+            // Create a position immediately in front of pawn
+            Position oneMovePosition = fromPosition + _forward;
 
             //Check if the pawn can move there
             if (CanMoveTo(oneMovePosition, board))
             {
                 yield return new NormalMove(fromPosition, oneMovePosition);
 
-                Position twoMovesPosition = oneMovePosition + forward;
+                Position twoMovesPosition = oneMovePosition + _forward;
 
                 // a method to check if it's the first pawn move, then can move 2 squares
                 if (!HasMoved && CanMoveTo(twoMovesPosition, board))
@@ -75,7 +75,7 @@ namespace ChessLogic.ChessPiece
             foreach (Direction direction in new Direction[] { Direction.West, Direction.East })
             {
                 // create the diagonal position in a single direction
-                Position toPosition = fromPosition + forward + direction;
+                Position toPosition = fromPosition + _forward + direction;
 
                 // check if can capture a diagonal piece then move to this new position
                 if (CanCaptureAt(toPosition, board))
@@ -91,6 +91,16 @@ namespace ChessLogic.ChessPiece
             return ForwardMoves(fromPosition, board).Concat(DiagonalMoves(fromPosition, board));
         }
 
+        // Override the 'CanCaptureKing' method to only check fewer positions
+        public override bool CanCaptureTheKing(Position fromPosition, Board board)
+        {
+            return DiagonalMoves(fromPosition, board)
+                .Any(move =>
+                {
+                    Piece piece = board[move.ToPosition];
+                    return piece != null && piece.Type == PieceType.King;
+                });
+        }
     }
 
 

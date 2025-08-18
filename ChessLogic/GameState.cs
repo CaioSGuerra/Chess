@@ -29,7 +29,9 @@ namespace ChessLogic
             // Get the piece from chosen position
             Piece piece = Board[position];
             // return all moves it can make
-            return piece.GetMoves(position, Board);
+            // Instead of make a move, now store a move then check if is a legal move by method 'IsLegal'
+            IEnumerable<Move> moveCandidates = piece.GetMoves(position, Board); // Stores all moves
+            return moveCandidates.Where(move => move.IsLegal(Board)); // Return all legal ones
         }
 
         // Create a method to make the piece move

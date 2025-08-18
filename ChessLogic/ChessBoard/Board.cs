@@ -1,15 +1,16 @@
 ﻿using ChessLogic.ChessPiece;
+using ChessLogic.Enum;
 
 namespace ChessLogic
 {
     public class Board
     {
-        private readonly Piece[,] pieces = new Piece[8, 8];
+        private readonly Piece[,] _pieces = new Piece[8, 8];
 
         public Piece this[int row, int column]
         {
-            get { return pieces[row, column]; }
-            set { pieces[row, column] = value; }
+            get { return _pieces[row, column]; }
+            set { _pieces[row, column] = value; }
         }
 
         public Piece this[Position position]
@@ -63,5 +64,57 @@ namespace ChessLogic
         {
             return this[position] == null;
         }
+
+        // A help Method to return all non-empty positions
+        public IEnumerable<Position> PiecePositions()
+        {
+            // Loops through all the positions
+            for (int row = 0; row < 8; row++)
+            {
+                for (int column = 0; column < 8; column++)
+                {
+                    // Return non-empty positions
+                    Position position = new Position(row, column);
+
+                    if (!IsEmpty(position))
+                    {
+                        yield return position;
+                    }
+
+                }
+            }
+        }
+
+        // A help method to get all positions containing a piece of a certain color
+        public IEnumerable<Position> PiecePositionsFor(Player player)
+        {
+            // Call 'PiecePosition' method
+            return PiecePositions().Where(position => this[position].Color == player); // Use where to pick only the positions of the player color
+        }
+
+        // Check if a king is in check
+        public bool IsInCheck(Player player)
+        {
+            return PiecePositionsFor(player.Opponent()) // Get the positions of the opponent pieces
+            .Any(position => // Then check if any of then can capture the players king
+            {
+                Piece piece = this[position]; // Get the opponent piece
+                return piece.CanCaptureTheKing(position, this); // Call 'CanCaptureKing' Method
+            });
+        }
+
+        // To filter any moves that leaves the king in check, this method will help by Copying the board
+        public Board Copy()
+        {
+            Board copy = new Board(); // Create a new empty board
+
+            foreach (Position position in PiecePositions()) // Loop through all positions containing a piece
+            {
+                copy[position] = this[position].Copy();// Then copy their positions new board
+            }
+
+            return copy; // Then return the copy
+        }
+
     }
 }

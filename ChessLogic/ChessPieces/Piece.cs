@@ -44,5 +44,19 @@ namespace ChessLogic.ChessPiece
             // Collect all reachable positions for all ggiven directions
             return directionVector.SelectMany(direction => MovePositionsInDirection(fromPosition, board, direction));
         }
+
+        // this method return true if this piece can capture king
+        public virtual bool CanCaptureTheKing(Position fromPosition, Board board)
+        {
+            // Generates all moves the piece can make disregarding whether it leaves the player  in check
+            return GetMoves(fromPosition, board)  // Then check if any of these moves captures the opponent king
+                .Any(move =>     // To do that, it grab the piece at the at moves to position
+                {
+                    Piece piece = board[move.ToPosition]; // Then check if it's a king
+                    return piece != null && piece.Type == PieceType.King;
+                });
+
+
+        }
     }
 }

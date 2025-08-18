@@ -14,7 +14,7 @@ namespace ChessLogic.ChessPiece
         }
 
         // A direction array that contains all directions
-        private static readonly Direction[] directionVector = new Direction[]
+        private static readonly Direction[] _directionVector = new Direction[]
         {
             Direction.North,
             Direction.East,
@@ -35,7 +35,7 @@ namespace ChessLogic.ChessPiece
         // A method to implement 'GetMoves' por super class
         public override IEnumerable<Move> GetMoves(Position fromPosition, Board board)
         {
-            return MovePositionsInDirection(fromPosition, board, directionVector).Select(toPosition => new NormalMove(fromPosition, toPosition));
+            return MovePositionsInDirection(fromPosition, board, _directionVector).Select(toPosition => new NormalMove(fromPosition, toPosition));
         }
     }
 }
