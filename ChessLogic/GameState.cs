@@ -9,6 +9,7 @@ namespace ChessLogic
     {
         public Board Board { get; set; }
         public Player CurrentPLayer { get; private set; }
+        public Result Result { get; private set; } = null;
 
         public GameState(Player player, Board board)
         {
@@ -39,7 +40,48 @@ namespace ChessLogic
         {
             move.Execute(Board);
             CurrentPLayer = CurrentPLayer.Opponent();
+            CheckForGameOver(); // Use 'CheckForGameOver' method to check after each move has been made
         }
 
+        // A Method to generate all moves the plaer can make
+        public IEnumerable<Move> AllLegalMovesFor(Player player)
+        {
+            // Create a variable of all candidate moves
+            IEnumerable<Move> moveCandidates =
+                Board.PiecePositionsFor(player) // Get all positions containing a selected player position
+                .SelectMany(position => // Collect moves for each piece
+                {
+                    Piece piece = Board[position];
+                    return piece.GetMoves(position, Board); // This give a collection of all moves the player can make including the illegal ones
+                });
+
+            return moveCandidates.Where(move => move.IsLegal(Board));  // This remove all illegal moves
+        }
+
+        // This method is to check every end of turn if the current player can move
+        private void CheckForGameOver()
+        {
+            // If the new player does have not any legal moves
+            if (!AllLegalMovesFor(CurrentPLayer).Any())
+            {
+                // Then check if it's a Checkmate or Stalemate
+                if (Board.IsInCheck(CurrentPLayer))
+                {
+                    // If the current player is in  check, then it's in Checkmate so the previous player won
+                    Result = Result.Win(CurrentPLayer.Opponent());
+                }
+                else
+                {
+                    // Otherwise the match is in a stalemate and the game ends with draw
+                    Result = Result.Draw(EndReason.Stalemate);
+                }
+            }
+        }
+
+        public bool IsGameOver()
+        {
+            // Ends the game if Result have a EndReason reason
+            return Result != null;
+        }
     }
 }
