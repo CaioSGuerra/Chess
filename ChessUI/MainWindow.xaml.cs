@@ -79,6 +79,12 @@ namespace ChessUI
         // This method is called when a player clicks somewhere in the board
         private void BoardGrid_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            // Prevents any game click when the menu is open
+            if (IsMenuOnScreen())
+            {
+                return;
+            }
+
             Point point = e.GetPosition(BoardGrid);
             // Call ToSqaurePosition to turn the clicked area in a square position
             Position position = ToSquarePosition(point);
@@ -132,6 +138,12 @@ namespace ChessUI
             gameState.MakeMove(move);
             DrawBoard(gameState.Board);
             SetCursor(gameState.CurrentPLayer);
+
+            // check if is the end of the game after a move
+            if (gameState.IsGameOver())
+            {
+                ShowGameOver();
+            }
         }
         private void OnToPositionSelected(Position position)
         {
@@ -194,6 +206,44 @@ namespace ChessUI
             {
                 Cursor = ChessCursors.BlackCursor;
             }
+        }
+
+        // Display a menu on screen if 'MenuContainer' is not empty
+        private bool IsMenuOnScreen()
+        {
+            return MenuContainer.Content != null;
+        }
+
+        // Restart the game, hiding any highlights, clear the move cache, instance a new game then draw a new board and cursor
+        private void RestartGame()
+        {
+            HideHighlights();
+            moveCache.Clear();
+            gameState = new GameState(Player.White, Board.Initial());
+            DrawBoard(gameState.Board);
+            SetCursor(gameState.CurrentPLayer);
+        }
+
+
+        // Create a new game menu or shutdown the application
+        private void ShowGameOver()
+        {
+            GameOverMenu gameOverMenu = new GameOverMenu(gameState);  //Instance a new game menu
+            MenuContainer.Content = gameOverMenu;      // SHow the game menu on screen
+
+            gameOverMenu.OptionSelected += option =>    // This show option to player to click
+            {
+                if (option == Enum.Option.Restart) // Restart the game option
+                {
+                    MenuContainer.Content = null; // Hides the game menu
+                    RestartGame();
+                }
+                else
+                {
+                    Application.Current.Shutdown();
+                }
+            }
+
         }
     }
 }
