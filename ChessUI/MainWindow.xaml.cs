@@ -2,6 +2,7 @@
 using ChessLogic.ChessPiece;
 using ChessLogic.Enum;
 using ChessLogic.Moves;
+using ChessUI.Menus;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -152,19 +153,6 @@ namespace ChessUI
             };
         }
 
-        // This method tells the GameState.cs to execute the given move
-        private void HandleMove(Move move)
-        {
-            gameState.MakeMove(move);
-            DrawBoard(gameState.Board);
-            SetCursor(gameState.CurrentPLayer);
-
-            // check if is the end of the game after a move
-            if (gameState.IsGameOver())
-            {
-                ShowGameOver();
-            }
-        }
         private void OnToPositionSelected(Position position)
         {
             // reset the selected position, then hide highlights
@@ -184,6 +172,20 @@ namespace ChessUI
                 {
                     HandleMove(move);
                 }
+            }
+        }
+
+        // This method tells the GameState.cs to execute the given move
+        private void HandleMove(Move move)
+        {
+            gameState.MakeMove(move);
+            DrawBoard(gameState.Board);
+            SetCursor(gameState.CurrentPLayer);
+
+            // check if is the end of the game after a move
+            if (gameState.IsGameOver())
+            {
+                ShowGameOver();
             }
         }
 

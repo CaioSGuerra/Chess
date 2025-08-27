@@ -54,9 +54,9 @@ namespace ChessLogic
         }
 
         //return true is the new position is inside the board
-        public static bool IsInside(Position postion)
+        public static bool IsInside(Position position)
         {
-            return postion.Row >= 0 && postion.Row < 8 && postion.Column >= 0 && postion.Column < 8;
+            return position.Row >= 0 && position.Row < 8 && position.Column >= 0 && position.Column < 8;
         }
 
         //check if there's a piece on the new position
