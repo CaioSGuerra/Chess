@@ -47,6 +47,15 @@ namespace ChessLogic.ChessPiece
             return board[position].Color != Color;
         }
 
+        // Method to promote a pawn, takes the position of pawn and returns selected piece
+        private static IEnumerable<Move> PromotionMoves(Position fromPosition, Position toPosition)
+        {
+            yield return new PawnPromotion(fromPosition, toPosition, PieceType.Knight);
+            yield return new PawnPromotion(fromPosition, toPosition, PieceType.Bishop);
+            yield return new PawnPromotion(fromPosition, toPosition, PieceType.Rook);
+            yield return new PawnPromotion(fromPosition, toPosition, PieceType.Queen);
+        }
+
         // Method of all forward and non-capture moves
         private IEnumerable<Move> ForwardMoves(Position fromPosition, Board board)
         {
@@ -56,7 +65,18 @@ namespace ChessLogic.ChessPiece
             //Check if the pawn can move there
             if (CanMoveTo(oneMovePosition, board))
             {
-                yield return new NormalMove(fromPosition, oneMovePosition);
+                // Check if the pawn is in the end of the other board, then call the Method 'PromotionMoves'
+                if (oneMovePosition.Row == 0 || oneMovePosition.Row == 7)
+                {
+                    foreach (Move promotionMove in PromotionMoves(fromPosition, oneMovePosition))
+                    {
+                        yield return promotionMove;
+                    }
+                }
+                else
+                {
+                    yield return new NormalMove(fromPosition, oneMovePosition);
+                }
 
                 Position twoMovesPosition = oneMovePosition + _forward;
 
@@ -66,7 +86,6 @@ namespace ChessLogic.ChessPiece
                     yield return new NormalMove(fromPosition, twoMovesPosition);
                 }
             }
-
         }
 
         // A Method to capture in diagonal
@@ -78,7 +97,15 @@ namespace ChessLogic.ChessPiece
                 Position toPosition = fromPosition + _forward + direction;
 
                 // check if can capture a diagonal piece then move to this new position
-                if (CanCaptureAt(toPosition, board))
+                // Check if the pawn is in the end of the other board after capture, then call the Method 'PromotionMoves'
+                if (toPosition.Row == 0 || toPosition.Row == 7)
+                {
+                    foreach (Move promotionMove in PromotionMoves(fromPosition, toPosition))
+                    {
+                        yield return promotionMove;
+                    }
+                }
+                else
                 {
                     yield return new NormalMove(fromPosition, toPosition);
                 }

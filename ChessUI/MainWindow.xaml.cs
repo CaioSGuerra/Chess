@@ -132,6 +132,26 @@ namespace ChessUI
             }
         }
 
+        // Method to show the promotion menu, then return the selected piece
+        private void HandlePromotion(Position fromPosition, Position toPosition)
+        {
+            // This show an image only the image of pawn move, without actually moving it
+            pieceImages[toPosition.Row, toPosition.Column].Source = Images.GetImage(gameState.CurrentPLayer, PieceType.Pawn);
+            pieceImages[fromPosition.Row, fromPosition.Column].Source = null;
+
+            // Open the menu to choose a piece for promotion
+            PromotionMenu promotionMenu = new PromotionMenu(gameState.CurrentPLayer);
+            MenuContainer.Content = promotionMenu;
+
+            // Remove the menu returning the selected piece at the destiny and finish the move
+            promotionMenu.PieceSelected += type =>
+            {
+                MenuContainer.Content = null;
+                Move promotionMove = new PawnPromotion(fromPosition, toPosition, type);
+                HandleMove(promotionMove);
+            };
+        }
+
         // This method tells the GameState.cs to execute the given move
         private void HandleMove(Move move)
         {
@@ -154,7 +174,16 @@ namespace ChessUI
             // Check if 'position' exists in moveCache, and if it does, store the value in 'move'
             if (moveCache.TryGetValue(position, out Move move))
             {
-                HandleMove(move);
+                // If the position exist in moveCache, then checks if it's a 'PawnPromontion' move
+                if (move.Type == MoveType.PawnPromotion)
+                {
+                    // To handle a promotion, the system shows a selection menu and return a new piece, before the move execute
+                    HandlePromotion(move.FromPosition, move.ToPosition);
+                }
+                else
+                {
+                    HandleMove(move);
+                }
             }
         }
 
@@ -242,7 +271,7 @@ namespace ChessUI
                 {
                     Application.Current.Shutdown();
                 }
-            }
+            };
 
         }
     }
