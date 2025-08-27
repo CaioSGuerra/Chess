@@ -1,6 +1,9 @@
 ﻿namespace ChessUI.Enum
 {
-    internal class Option
+    public enum Option
     {
+        Restart,
+        Exit,
+        Continue
     }
 }

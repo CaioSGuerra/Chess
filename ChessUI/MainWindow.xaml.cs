@@ -79,6 +79,12 @@ namespace ChessUI
         // This method is called when a player clicks somewhere in the board
         private void BoardGrid_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            // This block any other click while there's a menu on screen
+            if (IsMenuOnScreen())
+            {
+                return;
+            }
+
             Point point = e.GetPosition(BoardGrid);
             // Call ToSqaurePosition to turn the clicked area in a square position
             Position position = ToSquarePosition(point);
@@ -126,13 +132,6 @@ namespace ChessUI
             }
         }
 
-        // This method tells the GameState.cs to execute the given move
-        private void HandleMove(Move move)
-        {
-            gameState.MakeMove(move);
-            DrawBoard(gameState.Board);
-            SetCursor(gameState.CurrentPLayer);
-        }
         private void OnToPositionSelected(Position position)
         {
             // reset the selected position, then hide highlights
@@ -145,6 +144,22 @@ namespace ChessUI
                 HandleMove(move);
             }
         }
+
+        // This method tells the GameState.cs to execute the given move
+        private void HandleMove(Move move)
+        {
+            gameState.MakeMove(move);
+            DrawBoard(gameState.Board);
+            SetCursor(gameState.CurrentPLayer);
+
+            // CHeck if the last move i a game over
+            if (gameState.IsGameOver())
+            {
+                ShowGameOver();
+            }
+        }
+
+
 
         // A method to take all available moves for the selected piece and stores then in the cache
         private void CacheMoves(IEnumerable<Move> storeMoves)
@@ -194,6 +209,42 @@ namespace ChessUI
             {
                 Cursor = ChessCursors.BlackCursor;
             }
+        }
+
+        // Return true if there's a menu on the screen
+        private bool IsMenuOnScreen()
+        {
+            return MenuContainer.Content != null;
+        }
+
+        // Creates the game over menu passing the final game state as a constructor
+        private void ShowGameOver()
+        {
+            GameOverMenu gameOverMenu = new GameOverMenu(gameState);
+            MenuContainer.Content = gameOverMenu;
+
+            gameOverMenu.OptionSelected += option =>
+            {
+                if (option == Enum.Option.Restart)
+                {
+                    MenuContainer.Content = null;
+                    RestartGame();
+                }
+                else
+                {
+                    Application.Current.Shutdown();
+                }
+            };
+        }
+
+        // Restart game method, clear all highlights, move cache, then create a new board
+        private void RestartGame()
+        {
+            HideHighlights();
+            moveCache.Clear();
+            gameState = new GameState(Player.White, Board.Initial());
+            DrawBoard(gameState.Board);
+            SetCursor(gameState.CurrentPLayer);
         }
     }
 }
