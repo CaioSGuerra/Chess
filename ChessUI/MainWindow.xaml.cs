@@ -22,7 +22,6 @@ namespace ChessUI
         private readonly Dictionary<Position, Move> moveCache = new Dictionary<Position, Move>();
 
         private GameState gameState;
-
         //  store position of selected Piece
         private Position selectedPosition = null;
 
@@ -81,7 +80,7 @@ namespace ChessUI
         // This method is called when a player clicks somewhere in the board
         private void BoardGrid_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            // Prevents any game click when the menu is open
+            // This block any other click while there's a menu on screen
             if (IsMenuOnScreen())
             {
                 return;
@@ -134,26 +133,6 @@ namespace ChessUI
             }
         }
 
-        // Method to show the promotion menu, then return the selected piece
-        private void HandlePromotion(Position fromPosition, Position toPosition)
-        {
-            // This show an image only the image of pawn move, without actually moving it
-            pieceImages[toPosition.Row, toPosition.Column].Source = Images.GetImage(gameState.CurrentPLayer, PieceType.Pawn);
-            pieceImages[fromPosition.Row, fromPosition.Column].Source = null;
-
-            // Open the menu to choose a piece for promotion
-            PromotionMenu promotionMenu = new PromotionMenu(gameState.CurrentPLayer);
-            MenuContainer.Content = promotionMenu;
-
-            // Remove the menu returning the selected piece at the destiny and finish the move
-            promotionMenu.PieceSelected += type =>
-            {
-                MenuContainer.Content = null;
-                Move promotionMove = new PawnPromotion(fromPosition, toPosition, type);
-                HandleMove(promotionMove);
-            };
-        }
-
         private void OnToPositionSelected(Position position)
         {
             // reset the selected position, then hide highlights
@@ -175,6 +154,7 @@ namespace ChessUI
                 }
             }
         }
+
 
         // This method handles the 'MoveType.PawnPromotion'
         // It's invoked by 'OnToPosition' if the conditions are met
@@ -199,7 +179,6 @@ namespace ChessUI
                 Move promotionMove = new PawnPromotion(fromPosition, toPosition, type);
                 HandleMove(promotionMove);
             };
-
         }
 
         // This method tells the GameState.cs to execute the given move
@@ -209,12 +188,14 @@ namespace ChessUI
             DrawBoard(gameState.Board);
             SetCursor(gameState.CurrentPLayer);
 
-            // check if is the end of the game after a move
+            // CHeck if the last move i a game over
             if (gameState.IsGameOver())
             {
                 ShowGameOver();
             }
         }
+
+
 
         // A method to take all available moves for the selected piece and stores then in the cache
         private void CacheMoves(IEnumerable<Move> storeMoves)
@@ -266,34 +247,23 @@ namespace ChessUI
             }
         }
 
-        // Display a menu on screen if 'MenuContainer' is not empty
+        // Return true if there's a menu on the screen
         private bool IsMenuOnScreen()
         {
             return MenuContainer.Content != null;
         }
 
-        // Restart the game, hiding any highlights, clear the move cache, instance a new game then draw a new board and cursor
-        private void RestartGame()
-        {
-            HideHighlights();
-            moveCache.Clear();
-            gameState = new GameState(Player.White, Board.Initial());
-            DrawBoard(gameState.Board);
-            SetCursor(gameState.CurrentPLayer);
-        }
-
-
-        // Create a new game menu or shutdown the application
+        // Creates the game over menu passing the final game state as a constructor
         private void ShowGameOver()
         {
-            GameOverMenu gameOverMenu = new GameOverMenu(gameState);  //Instance a new game menu
-            MenuContainer.Content = gameOverMenu;      // SHow the game menu on screen
+            GameOverMenu gameOverMenu = new GameOverMenu(gameState);
+            MenuContainer.Content = gameOverMenu;
 
-            gameOverMenu.OptionSelected += option =>    // This show option to player to click
+            gameOverMenu.OptionSelected += option =>
             {
-                if (option == Enum.Option.Restart) // Restart the game option
+                if (option == Enum.Option.Restart)
                 {
-                    MenuContainer.Content = null; // Hides the game menu
+                    MenuContainer.Content = null;
                     RestartGame();
                 }
                 else
@@ -301,7 +271,16 @@ namespace ChessUI
                     Application.Current.Shutdown();
                 }
             };
+        }
 
+        // Restart game method, clear all highlights, move cache, then create a new board
+        private void RestartGame()
+        {
+            HideHighlights();
+            moveCache.Clear();
+            gameState = new GameState(Player.White, Board.Initial());
+            DrawBoard(gameState.Board);
+            SetCursor(gameState.CurrentPLayer);
         }
     }
 }

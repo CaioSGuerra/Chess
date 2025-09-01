@@ -65,26 +65,31 @@ namespace ChessLogic.ChessPiece
             //Check if the pawn can move there
             if (CanMoveTo(oneMovePosition, board))
             {
-                // Check if the pawn is in the end of the other board, then call the Method 'PromotionMoves'
-                if (oneMovePosition.Row == 0 || oneMovePosition.Row == 7)
+                //Check if the pawn can move there
+                if (CanMoveTo(oneMovePosition, board))
                 {
-                    foreach (Move promotionMove in PromotionMoves(fromPosition, oneMovePosition))
+                    // Check if the pawn is in the end of the other board, then call the Method 'PromotionMoves'
+                    if (oneMovePosition.Row == 0 || oneMovePosition.Row == 7)
                     {
-                        yield return promotionMove;
+                        foreach (Move promotionMove in PromotionMoves(fromPosition, oneMovePosition))
+                        {
+                            yield return promotionMove;
+                        }
+                    }
+                    else
+                    {
+                        yield return new NormalMove(fromPosition, oneMovePosition);
+                    }
+
+                    Position twoMovesPosition = oneMovePosition + _forward;
+
+                    // a method to check if it's the first pawn move, then can move 2 squares
+                    if (!HasMoved && CanMoveTo(twoMovesPosition, board))
+                    {
+                        yield return new NormalMove(fromPosition, twoMovesPosition);
                     }
                 }
-                else
-                {
-                    yield return new NormalMove(fromPosition, oneMovePosition);
-                }
 
-                Position twoMovesPosition = oneMovePosition + _forward;
-
-                // a method to check if it's the first pawn move, then can move 2 squares
-                if (!HasMoved && CanMoveTo(twoMovesPosition, board))
-                {
-                    yield return new NormalMove(fromPosition, twoMovesPosition);
-                }
             }
         }
 
@@ -97,17 +102,10 @@ namespace ChessLogic.ChessPiece
                 Position toPosition = fromPosition + _forward + direction;
 
                 // check if can capture a diagonal piece then move to this new position
-                // Check if the pawn is in the end of the other board after capture, then call the Method 'PromotionMoves'
-                if (toPosition.Row == 0 || toPosition.Row == 7)
+                if (CanCaptureAt(toPosition, board))
                 {
-                    foreach (Move promotionMove in PromotionMoves(fromPosition, toPosition))
-                    {
-                        yield return promotionMove;
-                    }
-                }
-                else
-                {
-                    // Check if the pawn is in the end of the other board, then call the Method 'PromotionMoves'
+                    // check if can capture a diagonal piece then move to this new position
+                    // Check if the pawn is in the end of the other board after capture, then call the Method 'PromotionMoves'
                     if (toPosition.Row == 0 || toPosition.Row == 7)
                     {
                         foreach (Move promotionMove in PromotionMoves(fromPosition, toPosition))

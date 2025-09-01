@@ -29,8 +29,8 @@ namespace ChessLogic.ChessPiece
                 // All horizontal positions
                 foreach (Direction horizontalDirection in new Direction[] { Direction.West, Direction.East })
                 {
-                    yield return fromPosition + 2 * verticalDirection + horizontalDirection;
-                    yield return fromPosition + 2 * verticalDirection + horizontalDirection;
+                    yield return fromPosition + (2 * verticalDirection) + horizontalDirection;
+                    yield return fromPosition + (2 * horizontalDirection) + verticalDirection;
                 }
             }
         }
