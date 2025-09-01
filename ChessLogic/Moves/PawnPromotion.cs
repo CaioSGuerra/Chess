@@ -11,9 +11,9 @@ namespace ChessLogic.Moves
 
         private readonly PieceType _newType;  // This variable will contain the type of piece the pawn will be promoted to
 
-        public PawnPromotion(Position fromPostiion, Position toPosition, PieceType newType)
+        public PawnPromotion(Position fromPosition, Position toPosition, PieceType newType)
         {
-            FromPosition = fromPostiion;
+            FromPosition = fromPosition;
             ToPosition = toPosition;
             _newType = newType;
         }

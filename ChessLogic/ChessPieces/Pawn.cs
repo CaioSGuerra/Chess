@@ -107,7 +107,18 @@ namespace ChessLogic.ChessPiece
                 }
                 else
                 {
-                    yield return new NormalMove(fromPosition, toPosition);
+                    // Check if the pawn is in the end of the other board, then call the Method 'PromotionMoves'
+                    if (toPosition.Row == 0 || toPosition.Row == 7)
+                    {
+                        foreach (Move promotionMove in PromotionMoves(fromPosition, toPosition))
+                        {
+                            yield return promotionMove;
+                        }
+                    }
+                    else
+                    {
+                        yield return new NormalMove(fromPosition, toPosition);
+                    }
                 }
             }
         }

@@ -9,7 +9,10 @@ namespace ChessUI.Menus
     /// </summary>
     public partial class PromotionMenu : UserControl
     {
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
         public event Action<PieceType> PieceSelected;
 
         public PromotionMenu(Player player)
@@ -22,8 +25,11 @@ namespace ChessUI.Menus
             KnightImg.Source = Images.GetImage(player, PieceType.Knight);
         }
 
+<<<<<<< Updated upstream
 
 
+=======
+>>>>>>> Stashed changes
         private void QueenImg_MouseDown(object sender, MouseButtonEventArgs e)
         {
             PieceSelected?.Invoke(PieceType.Queen);
