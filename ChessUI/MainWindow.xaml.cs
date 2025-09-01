@@ -2,6 +2,7 @@
 using ChessLogic.ChessPiece;
 using ChessLogic.Enum;
 using ChessLogic.Moves;
+using ChessUI.Menus;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -141,8 +142,43 @@ namespace ChessUI
             // Check if 'position' exists in moveCache, and if it does, store the value in 'move'
             if (moveCache.TryGetValue(position, out Move move))
             {
-                HandleMove(move);
+                // Check if the new position matches the PawnPromotion move type conditions;
+                // if so, invoke a promotion handler instead of a normal move
+                if (move.Type == MoveType.PawnPromotion)
+                {
+                    HandlePromotion(move.FromPosition, move.ToPosition);
+                }
+                else
+                {
+                    HandleMove(move);
+                }
             }
+        }
+
+
+        // This method handles the 'MoveType.PawnPromotion'
+        // It's invoked by 'OnToPosition' if the conditions are met
+        private void HandlePromotion(Position fromPosition, Position toPosition)
+        {
+            // an intermediate step to show pawn in 'to' position
+            // Render the pawn image at the new location and hide it at the old one
+            // This is done before executing the move
+            pieceImages[toPosition.Row, toPosition.Column].Source = Images.GetImage(gameState.CurrentPLayer, PieceType.Pawn);
+            pieceImages[fromPosition.Row, fromPosition.Column].Source = null;
+
+            // Instantiate the 'PromotionMenu' class
+            PromotionMenu promotionMenu = new PromotionMenu(gameState.CurrentPLayer);
+            // Assign in the 'MenuContainer"
+            MenuContainer.Content = promotionMenu;
+
+            // Handle the selected piece in menu
+            // Then return to 'HandleMove' method
+            promotionMenu.PieceSelected += type =>
+            {
+                MenuContainer.Content = null;
+                Move promotionMove = new PawnPromotion(fromPosition, toPosition, type);
+                HandleMove(promotionMove);
+            };
         }
 
         // This method tells the GameState.cs to execute the given move
