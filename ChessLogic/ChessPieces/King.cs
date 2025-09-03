@@ -28,6 +28,53 @@ namespace ChessLogic.ChessPiece
             Color = color;
         }
 
+        // this method check if the Rook piece has moved, this is a requirement for castle move
+        private static bool IsUnmovedRook(Position position, Board board)
+        {
+            if (board.IsEmpty(position))
+            {
+                return false;
+            }
+
+            Piece piece = board[position];
+            return piece.Type == PieceType.Rook && !piece.HasMoved;
+
+        }
+
+        // This method is a requirement for Castle move, check if all positions given are empty
+        private static bool AllEmpty(IEnumerable<Position> positions, Board board)
+        {
+            return positions.All(position => board.IsEmpty(position));
+        }
+
+        // This method use both 'IsUnmovedRook' and 'AllEmpty' to check is Castle move conditions are met on the king side (right)
+        private bool CanCastleKingSide(Position fromPosition, Board board)
+        {
+            if (HasMoved)
+            {
+                return false;
+            }
+
+            Position rookPosition = new Position(fromPosition.Row, 7);
+            Position[] betweenPositions = new Position[] { new(fromPosition.Row, 5), new(fromPosition.Row, 6) }; // This give all arguments to AllEmpty method
+
+            return IsUnmovedRook(rookPosition, board) && AllEmpty(betweenPositions, board);
+        }
+
+        // This method use both 'IsUnmovedRook' and 'AllEmpty' to check is Castle move conditions are met on the queen side (left)
+        private bool CanCastleQueenSide(Position fromPosition, Board board)
+        {
+            if (HasMoved)
+            {
+                return false;
+            }
+
+            Position rookPosition = new Position(fromPosition.Row, 0);
+            Position[] betweenPositions = new Position[] { new(fromPosition.Row, 1), new(fromPosition.Row, 2), new(fromPosition.Row, 3) };
+
+            return IsUnmovedRook(rookPosition, board) && AllEmpty(betweenPositions, board);
+        }
+
         public override Piece Copy()
         {
             King copy = new King(Color);
@@ -66,6 +113,17 @@ namespace ChessLogic.ChessPiece
             {
                 // Return a normal move from each of them
                 yield return new NormalMove(fromPosition, toPosition);
+            }
+
+            // if the move is a Castle Move, return the positions according which side
+            if (CanCastleKingSide(fromPosition, board))
+            {
+                yield return new Castle(MoveType.CastleKingSide, fromPosition);
+            }
+
+            if (CanCastleQueenSide(fromPosition, board))
+            {
+                yield return new Castle(MoveType.CastleQueenSide, fromPosition);
             }
         }
 
