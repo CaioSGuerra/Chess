@@ -84,9 +84,10 @@ namespace ChessLogic.ChessPiece
                     Position twoMovesPosition = oneMovePosition + _forward;
 
                     // a method to check if it's the first pawn move, then can move 2 squares
+                    // Uses the new move 'DoublePawn', to allow En Passant checks
                     if (!HasMoved && CanMoveTo(twoMovesPosition, board))
                     {
-                        yield return new NormalMove(fromPosition, twoMovesPosition);
+                        yield return new DoublePawn(fromPosition, twoMovesPosition);
                     }
                 }
 
@@ -101,6 +102,12 @@ namespace ChessLogic.ChessPiece
                 // create the diagonal position in a single direction
                 Position toPosition = fromPosition + _forward + direction;
 
+                // Generate the 'EnPassant' move to capture the pawn
+                if (toPosition == board.GetPawnSkipPosition(Color.Opponent()))
+                {
+                    yield return new EnPassant(fromPosition, toPosition);
+                }
+                else
                 // check if can capture a diagonal piece then move to this new position
                 if (CanCaptureAt(toPosition, board))
                 {

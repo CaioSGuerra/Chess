@@ -38,12 +38,18 @@ namespace ChessLogic
         // Create a method to make the piece move
         public void MakeMove(Move move)
         {
+            // This line disables any En Passant move by clearing the skip position.
+            // The En Passant rule allows a pawn capture only on the immediately following move.
+            // If any other piece moves, the En Passant opportunity is lost.
+            // Therefore, clear the skip position on the next turn of the vulnerable pawn’s player.
+            Board.SetPawnSkipPosition(CurrentPLayer, null);
+
             move.Execute(Board);
             CurrentPLayer = CurrentPLayer.Opponent();
             CheckForGameOver(); // Use 'CheckForGameOver' method to check after each move has been made
         }
 
-        // A Method to generate all moves the plaer can make
+        // A Method to generate all moves the player can make
         public IEnumerable<Move> AllLegalMovesFor(Player player)
         {
             // Create a variable of all candidate moves

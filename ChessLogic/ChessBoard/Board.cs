@@ -7,6 +7,14 @@ namespace ChessLogic
     {
         private readonly Piece[,] _pieces = new Piece[8, 8];
 
+        // When a pawn move 2 square, stores the skip position, the position behind the pawn
+        // This is a pre-requisite to En Passant move
+        private readonly Dictionary<Player, Position> pawnSkipPositions = new Dictionary<Player, Position>()
+        {
+            { Player.White, null },
+            { Player.Black, null }
+        };
+
         public Piece this[int row, int column]
         {
             get { return _pieces[row, column]; }
@@ -19,6 +27,17 @@ namespace ChessLogic
             set { this[position.Row, position.Column] = value; }
         }
 
+        // Return the position of skipped square when a player move 2 square in one move
+        public Position GetPawnSkipPosition(Player player)
+        {
+            return pawnSkipPositions[player];
+        }
+
+        // Get the player and the skipped positions, then stores in the dictionary 
+        public void SetPawnSkipPosition(Player player, Position position)
+        {
+            pawnSkipPositions[player] = position;
+        }
         public static Board Initial()
         {
             Board board = new Board();
