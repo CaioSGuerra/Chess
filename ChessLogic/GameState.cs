@@ -82,6 +82,12 @@ namespace ChessLogic
                     Result = Result.Draw(EndReason.Stalemate);
                 }
             }
+            // If there's not enough piece to let a king in checkmate then it's a draw
+            else if (Board.InsufficientMaterial())
+            {
+                Result = Result.Draw(EndReason.InsufficientMaterial); ;
+            }
+
         }
 
         public bool IsGameOver()

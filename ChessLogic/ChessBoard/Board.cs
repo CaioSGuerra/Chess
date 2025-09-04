@@ -135,5 +135,76 @@ namespace ChessLogic
             return copy; // Then return the copy
         }
 
+        // This method will count how many pieces and types each player have in game
+        public Counting CountPieces()
+        {
+            Counting counting = new Counting();
+
+            foreach (Position position in PiecePositions())
+            {
+                Piece piece = this[position];
+                counting.Increment(piece.Color, piece.Type);
+            }
+
+            return counting;
+        }
+
+        // This method checks if there are enough pieces left in the game to allow a win.
+        // For example, if there are only two kings, the game should not continue infinitely.
+        // In that case, this method will return true to indicate a draw.
+        public bool InsufficientMaterial()
+        {
+            Counting counting = CountPieces();
+
+            return IsKingVsKing(counting) || IsKingBishopVsKing(counting) ||
+                IsKingKnightVsKing(counting) || IsKingBishopVsKingBishop(counting);
+        }
+        // Next methods will handle each case of draw.
+
+        // This method checks the special case of King vs. King.
+        private static bool IsKingVsKing(Counting counting)
+        {
+            return counting.TotalCount == 2;
+        }
+
+        // This method checks the special case of King and Bishop vs King
+        private static bool IsKingBishopVsKing(Counting counting)
+        {
+            return counting.TotalCount == 3 && (counting.White(PieceType.Bishop) == 1 || counting.Black(PieceType.Bishop) == 1);
+        }
+
+        // This method checks the special case of King and Knight vs King
+        private static bool IsKingKnightVsKing(Counting counting)
+        {
+            return counting.TotalCount == 3 && (counting.White(PieceType.Knight) == 1 || counting.Black(PieceType.Knight) == 1);
+        }
+
+        // This method checks the special case of King and Bishop vs King and Bishop 
+        // Unlike the previous methods, this one can't be static because it calls 'FindPiece', which accesses instance data via the indexer (this[position])
+        private bool IsKingBishopVsKingBishop(Counting counting)
+        {
+            if (counting.TotalCount != 4)
+            {
+                return false;
+            }
+
+            if (counting.White(PieceType.Bishop) != 1 || counting.Black(PieceType.Bishop) != 1)
+            {
+                return false;
+            }
+
+            Position whiteBishopPosition = FindPiece(Player.White, PieceType.Bishop);
+            Position blackBishopPosition = FindPiece(Player.Black, PieceType.Bishop);
+
+            return whiteBishopPosition.SquareColor() == blackBishopPosition.SquareColor();
+        }
+
+
+        // This method find the first 'PieceType' of a 'Player' color given
+        // This is a help method for 'IsKingBishopVsKingBishop' method to work
+        private Position FindPiece(Player color, PieceType type)
+        {
+            return PiecePositionsFor(color).First(position => this[position].Type == type);
+        }
     }
 }
