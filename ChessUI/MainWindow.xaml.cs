@@ -2,6 +2,7 @@
 using ChessLogic.ChessPiece;
 using ChessLogic.Enum;
 using ChessLogic.Moves;
+using ChessUI.Enum;
 using ChessUI.Menus;
 using System.Windows;
 using System.Windows.Controls;
@@ -276,11 +277,38 @@ namespace ChessUI
         // Restart game method, clear all highlights, move cache, then create a new board
         private void RestartGame()
         {
+            selectedPosition = null;     // This statement is needed, because of implementation of PauseMenu, you can restart a game with a piece selected
             HideHighlights();
             moveCache.Clear();
             gameState = new GameState(Player.White, Board.Initial());
             DrawBoard(gameState.Board);
             SetCursor(gameState.CurrentPLayer);
+        }
+
+        // This method allow to show Pause Menu by clicking in Esc keyboard button
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (!IsMenuOnScreen() && e.Key == System.Windows.Input.Key.Escape)
+            {
+                ShowPauseMenu();
+            }
+        }
+
+        // This method creates a new instance of 'PauseMenu' and assigns actions to each button in it
+        private void ShowPauseMenu()
+        {
+            PauseMenu pauseMenu = new PauseMenu();
+            MenuContainer.Content = pauseMenu;
+
+            pauseMenu.OptionSelected += option =>
+            {
+                MenuContainer.Content = null;
+
+                if (option == Option.Restart)
+                {
+                    RestartGame();
+                }
+            };
         }
     }
 }
