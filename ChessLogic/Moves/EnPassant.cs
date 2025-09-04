@@ -24,10 +24,13 @@ namespace ChessLogic.Moves
         }
 
         // THis method move the pawn behind to the captured pawn
-        public override void Execute(Board board)
+        public override bool Execute(Board board)
         {
             new NormalMove(FromPosition, ToPosition).Execute(board);
             board[capturePosition] = null;
+
+            // Always return true because moves a pawn
+            return true;
         }
     }
 }

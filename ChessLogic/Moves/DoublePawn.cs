@@ -23,11 +23,14 @@ namespace ChessLogic.Moves
         // Make 1 move, stores this move and move another move
         // With this you get the stored and actual position
         // This is a requirement for En Passant move which will capture the pawn on the stored position
-        public override void Execute(Board board)
+        public override bool Execute(Board board)
         {
             Player player = board[FromPosition].Color;
             board.SetPawnSkipPosition(player, skippedPosition);
             new NormalMove(FromPosition, ToPosition).Execute(board);
+
+            // Always return true because moves a pawn
+            return true;
         }
     }
 }

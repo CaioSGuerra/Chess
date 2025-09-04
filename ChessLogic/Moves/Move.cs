@@ -10,7 +10,9 @@ namespace ChessLogic.Moves
         public abstract Position ToPosition { get; }
 
         //A method to make a move to happen
-        public abstract void Execute(Board board);
+        // now should return true if a piece is captured or a pawn was moved
+        // Changed from void to bool to indicate whether the move resets the 50-move rule counter
+        public abstract bool Execute(Board board);
 
         // This method use a 2° board to execute the move then check if the king is in check after the move, if yes, then it disallow the main board to execute this movement
         public virtual bool IsLegal(Board board)

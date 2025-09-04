@@ -11,6 +11,10 @@ namespace ChessLogic
         public Player CurrentPLayer { get; private set; }
         public Result Result { get; private set; } = null;
 
+        // Used for enforcing the 50-move rule in chess
+        // This counter increments after every move that is neither a capture nor a pawn move
+        private int noCaptureOrPawnMoves = 0;
+
         public GameState(Player player, Board board)
         {
             CurrentPLayer = player;
@@ -44,7 +48,19 @@ namespace ChessLogic
             // Therefore, clear the skip position on the next turn of the vulnerable pawn’s player.
             Board.SetPawnSkipPosition(CurrentPLayer, null);
 
-            move.Execute(Board);
+            // Executes the move and stores whether it resets the 50-move rule (capture or pawn move)
+            bool captureOrPawn = move.Execute(Board);
+
+            // If the move resets the rule, reset the counter; otherwise, increment it
+            if (captureOrPawn)
+            {
+                noCaptureOrPawnMoves = 0;
+            }
+            else
+            {
+                noCaptureOrPawnMoves++;
+            }
+
             CurrentPLayer = CurrentPLayer.Opponent();
             CheckForGameOver(); // Use 'CheckForGameOver' method to check after each move has been made
         }
@@ -87,13 +103,25 @@ namespace ChessLogic
             {
                 Result = Result.Draw(EndReason.InsufficientMaterial); ;
             }
-
+            // End the game after 50 moves without capture any piece or move a pawn
+            // This will prevent the game to be endless
+            else if (FiftyMoveRule())
+            {
+                Result = Result.Draw(EndReason.FiftyMoveRule);
+            }
         }
 
         public bool IsGameOver()
         {
             // Ends the game if Result have a EndReason reason
             return Result != null;
+        }
+
+        // Checks if the 50-move rule condition has been met (i.e., 50 full moves without capture or pawn move)
+        private bool FiftyMoveRule()
+        {
+            int fullMoves = noCaptureOrPawnMoves / 2;
+            return fullMoves == 50;
         }
     }
 }

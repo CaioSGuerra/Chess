@@ -39,10 +39,13 @@ namespace ChessLogic.Moves
         }
 
         // this method move both King and rook, sending 2 positions to the 'NormalMove' class
-        public override void Execute(Board board)
+        public override bool Execute(Board board)
         {
             new NormalMove(FromPosition, ToPosition).Execute(board);
             new NormalMove(rookFromPosition, rookToPosition).Execute(board);
+
+            // Castling never results in a capture; only the king and rook are moved
+            return false;
         }
 
         // In castle move, you can't move if king in check, put in check situation and any position between origin and destiny can put King in check 

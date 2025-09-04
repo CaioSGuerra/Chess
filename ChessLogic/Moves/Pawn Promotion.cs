@@ -31,7 +31,7 @@ namespace ChessLogic.Moves
         }
 
         // Executes a pawn promotion: removes the pawn and places the chosen promotion piece on the board
-        public override void Execute(Board board)
+        public override bool Execute(Board board)
         {
             // Remove the pawn from its current position
             Piece pawn = board[FromPosition];
@@ -42,6 +42,9 @@ namespace ChessLogic.Moves
             Piece promotionPiece = CreatePromotionPiece(pawn.Color);
             promotionPiece.HasMoved = true;
             board[ToPosition] = promotionPiece;
+
+            // Always return true because moves a pawn
+            return true;
         }
     }
 }
