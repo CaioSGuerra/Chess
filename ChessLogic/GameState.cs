@@ -14,11 +14,18 @@ namespace ChessLogic
         // Used for enforcing the 50-move rule in chess
         // This counter increments after every move that is neither a capture nor a pawn move
         private int noCaptureOrPawnMoves = 0;
+        private string _stateString;
+
+        private readonly Dictionary<string, int> _stateHistory = new Dictionary<string, int>();
 
         public GameState(Player player, Board board)
         {
             CurrentPLayer = player;
             Board = board;
+
+            // This string represents the board state and is used to detect Threefold Repetition
+            _stateString = new StateString(CurrentPLayer, board).ToString();
+            _stateHistory[_stateString] = 1;
         }
 
         // Take a position as a parameter and take all moves that piece can make
@@ -55,6 +62,10 @@ namespace ChessLogic
             if (captureOrPawn)
             {
                 noCaptureOrPawnMoves = 0;
+
+                // Since a captured piece changes the board state, it's no longer possible to repeat the same string
+                // Therefore, the cache is cleared to avoid unnecessary memory usage
+                _stateHistory.Clear();
             }
             else
             {
@@ -62,7 +73,9 @@ namespace ChessLogic
             }
 
             CurrentPLayer = CurrentPLayer.Opponent();
+            UpdateStateString();
             CheckForGameOver(); // Use 'CheckForGameOver' method to check after each move has been made
+
         }
 
         // A Method to generate all moves the player can make
@@ -109,6 +122,10 @@ namespace ChessLogic
             {
                 Result = Result.Draw(EndReason.FiftyMoveRule);
             }
+            else if (ThreeFoldRepetition())
+            {
+                Result = Result.Draw(EndReason.ThreefoldRepetition);
+            }
         }
 
         public bool IsGameOver()
@@ -123,5 +140,30 @@ namespace ChessLogic
             int fullMoves = noCaptureOrPawnMoves / 2;
             return fullMoves == 50;
         }
+
+        // This method counts repeated state strings
+        // It is used to end the game when a Threefold Repetition occurs
+        private void UpdateStateString()
+        {
+            _stateString = new StateString(CurrentPLayer, Board).ToString();
+
+            if (!_stateHistory.ContainsKey(_stateString))
+            {
+                _stateHistory[_stateString] = 1;
+            }
+            else
+            {
+                _stateHistory[_stateString]++;
+            }
+
+        }
+
+        // This method applies the Threefold Repetition rule
+        // It ends the game if the current board state has occurred three times
+        private bool ThreeFoldRepetition()
+        {
+            return _stateHistory[_stateString] == 3;
+        }
     }
+
 }
